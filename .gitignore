@@ -1,7 +1,0 @@
-blib*
-Makefile
-Makefile.old
-pm_to_blib*
-*.tar.gz
-Term-Shell-Pluggable-*
-.project
