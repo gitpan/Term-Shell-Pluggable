@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Term-Shell-Pluggable
-version:            0.01
+version:            0.02
 abstract:           Pluggable command-line framework
 author:
     - Dmitri Popov <operator@cv.dp-net.com>
