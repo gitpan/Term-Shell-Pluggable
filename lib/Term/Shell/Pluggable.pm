@@ -13,17 +13,44 @@ Term::Shell::Pluggable - Pluggable command-line framework
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
 There is Term::Shell module in the first place. Here is hybrid of that
 one with Module::Pluggable. So you could write big program with many modules
 commands in each one of them.
+
+	#!/usr/bin/env perl
+	package Example;
+	
+	use warnings;
+	use strict;
+	
+	use Getopt::Long qw(GetOptionsFromArray);
+	
+	sub smry_bubble { 'bubblesort numbers' }
+	sub run_bubble {
+		my $class = shift;
+		Getopt::Long::GetOptionsFromArray(\@_,
+			'verbose' => \my $verbose,
+		) and @_ or die "wrong options or numbers are missing\n" . $class->help_bubble;
+		my @numbers = @_;
+		...
+	}
+	sub help_bubble { <<HELP
+	usage: bubble [-v] <number1> <number2> ...
+	HELP
+	}
+	
+	package main;
+	
+	use Term::Shell::Pluggable;
+	Term::Shell::Pluggable->run(packages => ['Example']);
 
 =cut
 
@@ -250,17 +277,23 @@ sub load_file {
 
 sub attach_package {
 	my $self = shift;
-	my ($package_name) = @_;
+	my ($package_name, $sub_package_name) = @_;
 	die 'missing package name' unless $package_name;
 	my @t = split '::', $package_name;
 	my $modules = $self->{modules};
-	push @$modules, pop @t;
+	push @$modules, pop @t unless $sub_package_name;
 	{
 		no strict 'refs';
 		foreach my $sub_name (keys %{$package_name . '::'}) {
 			next unless $sub_name =~ /^(run|help|smry|comp|catch|alias)_/o;
-			$self->{r}->{$sub_name} = $package_name;
+			$self->{r}->{$sub_name} = $sub_package_name || $package_name;
 			$self->add_handlers($sub_name);
+		}
+	}
+	{
+		no strict 'refs';
+		foreach my $super_package_name (@{$package_name . '::ISA'}) {
+			$self->attach_package($super_package_name, $sub_package_name || $package_name);
 		}
 	}
 }
