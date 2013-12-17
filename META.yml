@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Term-Shell-Pluggable
-version:            0.03
+version:            0.04
 abstract:           Pluggable command-line framework
 author:
     - Dmitri Popov <operator@cv.dp-net.com>
@@ -11,6 +11,7 @@ configure_requires:
 build_requires:
     ExtUtils::MakeMaker:  0
 requires:
+    perl:         5.008008
     Term::Shell:  0
     Test::More:   0
 resources:
